@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - EduTech</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">EduTech Portal</div>
+            <nav class="d-flex flex-column gap-2" style="flex: 1;">
+                <a href="student-dashboard.html" class="nav-link active">🎓 My Dashboard</a>
+            </nav>
+            <div class="mt-4">
+                <button id="logout-btn" class="btn btn-outline" style="width: 100%;">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h2>Student Dashboard</h2>
+                <div class="d-flex items-center gap-2">
+                    <span>Welcome, <strong id="user-name-display">Student</strong></span>
+                </div>
+            </header>
+
+            <div id="alert-container"></div>
+
+            <div class="grid" style="grid-template-columns: 1fr 2fr; gap: 2rem;">
+
+                <!-- Profile Block -->
+                <div class="card">
+                    <div class="d-flex justify-between items-center mb-4">
+                        <h3>My Profile</h3>
+                        <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;"
+                            onclick="openProfileModal()">Edit</button>
+                    </div>
+                    <div id="profile-details"
+                        style="display: flex; flex-direction: column; gap: 1rem; color: var(--text-muted); font-size: 0.95rem;">
+                        <div><strong style="color: var(--text-main);">Roll Number:</strong> <span
+                                id="p-roll">Loading...</span></div>
+                        <div><strong style="color: var(--text-main);">Name:</strong> <span id="p-name">-</span></div>
+                        <div><strong style="color: var(--text-main);">Department:</strong> <span id="p-dept">-</span>
+                        </div>
+                        <div><strong style="color: var(--text-main);">Year:</strong> <span id="p-year">-</span></div>
+                        <div><strong style="color: var(--text-main);">Email:</strong> <span id="p-email">-</span></div>
+                        <div><strong style="color: var(--text-main);">Phone:</strong> <span id="p-phone">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Marks Block -->
+                <div class="card">
+                    <h3 class="mb-4">Academic Results</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Marks</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="marks-table-body">
+                                <tr>
+                                    <td colspan="4" class="text-center">Loading academic records...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal-overlay">
+        <div class="modal">
+            <h3 class="mb-4">Update Contact Details</h3>
+            <form id="profile-form">
+                <div class="form-group mb-1">
+                    <label>Email</label>
+                    <input type="email" id="edit_email" required>
+                </div>
+                <div class="form-group mb-4">
+                    <label>Phone Number</label>
+                    <input type="text" id="edit_phone" required>
+                </div>
+                <div class="d-flex justify-between">
+                    <button type="button" class="btn btn-outline"
+                        onclick="closeModal('edit-profile-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-profile-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        checkAuth('student');
+        let profileData = {};
+
+        async function loadDashboard() {
+            try {
+                // Fetch profile
+                const profile = await fetchWithAuth('/student/profile');
+                profileData = profile;
+
+                document.getElementById('p-roll').textContent = profile.roll_number;
+                document.getElementById('p-name').textContent = profile.name;
+                document.getElementById('p-dept').textContent = profile.department || 'Not Assigned';
+                document.getElementById('p-year').textContent = profile.year ? profile.year + ' Year' : 'Not Assigned';
+                document.getElementById('p-email').textContent = profile.email || '-';
+                document.getElementById('p-phone').textContent = profile.phone || '-';
+
+                // Fetch Marks
+                const marks = await fetchWithAuth('/student/marks');
+                const tbody = document.getElementById('marks-table-body');
+
+                if (marks.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">No academic records found.</td></tr>';
+                } else {
+                    tbody.innerHTML = marks.map(m => `
+                        <tr>
+                            <td style="font-weight: 500;">${m.course_code}</td>
+                            <td>${m.course_name}</td>
+                            <td style="color: ${m.marks < 40 ? 'var(--danger)' : 'var(--success)'}; font-weight: bold;">${m.marks}</td>
+                            <td>${m.marks >= 40 ? '<span style="color: var(--success)">Pass</span>' : '<span style="color: var(--danger)">Fail</span>'}</td>
+                        </tr>
+                    `).join('');
+                }
+
+            } catch (err) {
+                if (err.message === 'Unauthorized') return;
+                showAlert('alert-container', err.message, 'error');
+            }
+        }
+
+        function openProfileModal() {
+            document.getElementById('edit-profile-modal').classList.add('active');
+            document.getElementById('edit_email').value = profileData.email || '';
+            document.getElementById('edit_phone').value = profileData.phone || '';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                email: document.getElementById('edit_email').value,
+                phone: document.getElementById('edit_phone').value
+            };
+
+            try {
+                document.getElementById('save-profile-btn').disabled = true;
+                const response = await fetchWithAuth('/student/profile', {
+                    method: 'PUT', body: JSON.stringify(payload)
+                });
+                showAlert('alert-container', response.message, 'success');
+                closeModal('edit-profile-modal');
+                loadDashboard();
+            } catch (err) {
+                alert(err.message);
+            } finally {
+                document.getElementById('save-profile-btn').disabled = false;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+
+</html>

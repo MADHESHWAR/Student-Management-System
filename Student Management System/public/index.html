@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .portal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .portal-card {
+            text-align: center;
+            padding: 3rem 2rem;
+            cursor: pointer;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .portal-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .portal-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex-center" style="flex-direction: column; padding: 2rem;">
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color);">EduTech Management</h1>
+            <p style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Streamlined academic management platform
+                bridging students, faculty, and administration.</p>
+        </div>
+
+        <div class="portal-cards">
+            <a href="admin-login.html" class="card portal-card">
+                <div class="portal-icon">🛡️</div>
+                <h3>Admin Portal</h3>
+                <p class="mt-4">Manage students, courses, and system settings securely.</p>
+            </a>
+
+            <a href="student-login.html" class="card portal-card">
+                <div class="portal-icon">🎓</div>
+                <h3>Student Portal</h3>
+                <p class="mt-4">View academic details, marks, and manage your profile.</p>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

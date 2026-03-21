@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EduTech Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            line-height: 1;
+            margin: 1rem 0;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="logo">EduTech Admin</div>
+            <nav class="d-flex flex-column gap-2" style="flex: 1;">
+                <a href="admin-dashboard.html" class="nav-link active">📊 Dashboard</a>
+                <a href="students.html" class="nav-link">👥 Students</a>
+                <a href="courses.html" class="nav-link">📚 Courses</a>
+            </nav>
+            <div class="mt-4">
+                <button id="logout-btn" class="btn btn-outline" style="width: 100%;">🚪 Logout</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <h2>Admin Dashboard</h2>
+                <div class="d-flex items-center gap-2">
+                    <span>Welcome, <strong id="user-name-display">Admin</strong></span>
+                </div>
+            </header>
+
+            <div id="loading" class="text-center" style="padding: 3rem;">Loading statistics...</div>
+            <div id="dashboard-content" style="display: none;">
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <div class="card stat-card">
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-value" id="stat-students">0</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-label">Total Courses</div>
+                        <div class="stat-value" id="stat-courses" style="color: var(--secondary-color);">0</div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4 mb-2">Department Distribution</h3>
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Total Students</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dept-table-body">
+                                <tr>
+                                    <td colspan="2" class="text-center">No data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        checkAuth('admin');
+
+        async function loadDashboard() {
+            try {
+                const data = await fetchWithAuth('/admin/stats');
+
+                document.getElementById('stat-students').textContent = data.totalStudents;
+                document.getElementById('stat-courses').textContent = data.totalCourses;
+
+                const tableBody = document.getElementById('dept-table-body');
+                if (data.departments && data.departments.length > 0) {
+                    tableBody.innerHTML = '';
+                    data.departments.forEach(dept => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${dept.department || 'Unassigned'}</td>
+                            <td>${dept.count}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+            } catch (err) {
+                document.getElementById('loading').textContent = 'Error loading dashboard data.';
+                if (err.message === 'Unauthorized') return;
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+
+</html>
