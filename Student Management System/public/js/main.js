@@ -5,11 +5,6 @@ function initMockDB() {
     if (!localStorage.getItem('db_admins')) {
         localStorage.setItem('db_admins', JSON.stringify([{ id: 1, username: 'admin', password: 'admin123', name: 'Super Admin' }]));
     }
-    if (!localStorage.getItem('db_students')) {
-        localStorage.setItem('db_students', JSON.stringify([
-            { id: 1, roll_number: '12345', password: 'password', name: 'John Doe', department: 'Computer Science', year: 2, email: 'john@example.com', phone: '1234567890' }
-        ]));
-    }
     if (!localStorage.getItem('db_courses')) {
         localStorage.setItem('db_courses', JSON.stringify([
             { id: 1, course_code: 'CS101', course_name: 'Intro to Programming', department: 'Computer Science' }
