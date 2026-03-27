@@ -7,7 +7,7 @@ function initMockDB() {
     }
     if (!localStorage.getItem('db_students')) {
         localStorage.setItem('db_students', JSON.stringify([
-            { id: 1, roll_number: '12345', password: 'password', name: 'Student Default', department: 'Computer Science', year: 2, email: 'student@default.com', phone: '9876543210' }
+            { id: 1, roll_number: '12345', password: 'password', name: 'Demo Student', department: 'Computer Science', year: 2, email: 'student@default.com', phone: '9876543210' }
         ]));
     }
     if (!localStorage.getItem('db_courses')) {
@@ -64,7 +64,7 @@ window.fetch = async function (url, options) {
                 if (student) {
                     return jsonRes(200, { token: 'mock-student-' + student.id, student: { id: student.id, roll_number: student.roll_number, name: student.name } });
                 }
-                return jsonRes(401, { message: 'Invalid credentials.});
+                return jsonRes(401, { message: 'Invalid credentials.'});
             }
 
             // Verify Auth
