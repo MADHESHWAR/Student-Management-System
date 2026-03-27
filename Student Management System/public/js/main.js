@@ -49,7 +49,7 @@ window.fetch = async function (url, options) {
                 if (admin) {
                     return jsonRes(200, { token: 'mock-admin-' + admin.id, admin: { id: admin.id, name: admin.name, username: admin.username } });
                 }
-                return jsonRes(401, { message: 'Invalid credentials.' });
+                return jsonRes(401, { message: 'Invalid credentials.'});
             }
 
             // STUDENT LOGIN
@@ -59,7 +59,7 @@ window.fetch = async function (url, options) {
                 if (student) {
                     return jsonRes(200, { token: 'mock-student-' + student.id, student: { id: student.id, roll_number: student.roll_number, name: student.name } });
                 }
-                return jsonRes(401, { message: 'Invalid credentials. Default: 12345 / password' });
+                return jsonRes(401, { message: 'Invalid credentials.});
             }
 
             // Verify Auth
