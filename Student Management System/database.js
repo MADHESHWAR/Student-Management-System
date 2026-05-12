@@ -1,10 +1,9 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// If deploying to Render etc., rely on DATABASE_URL. Otherwise fallback to local configs.
 const poolConfig = process.env.DATABASE_URL ? {
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // Render requires SSL for external connections
+  ssl: { rejectUnauthorized: false },
   max: 10,
   idleTimeoutMillis: 30000
 } : {
@@ -69,7 +68,7 @@ async function initDB() {
       )
     `);
 
-    // Add default admin if not exists (username: admin, password: admin123)
+    // Add default admin (username: admin, password: admin123)
     const { rows: adminRows } = await client.query('SELECT * FROM admins WHERE username = $1', ['admin']);
     if (adminRows.length === 0) {
       const bcrypt = require('bcryptjs');
